@@ -5,6 +5,7 @@ const crypto = require("crypto");
 
 const root = __dirname;
 const dataDir = path.join(root, "data");
+const uploadsDir = path.join(dataDir, "uploads");
 const dbPath = path.join(dataDir, "db.json");
 
 const mimeTypes = {
@@ -12,6 +13,8 @@ const mimeTypes = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".pdf": "application/pdf",
+  ".txt": "text/plain; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".jpg": "image/jpeg",
@@ -25,7 +28,7 @@ const seedDb = {
     siteName: "NoteVault",
     tagline: "Sell notes securely",
     upiId: "yourname@upi",
-    adminCode: "ADMIN123",
+    adminCode: "abheer@123",
     accessPin: "VIEW2026",
     qrDataUrl: "",
   },
