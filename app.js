@@ -624,10 +624,12 @@ async function saveNote(event) {
   try {
     if (file) {
       fileName = file.name;
+      const looksLikePdf =
+        file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
       if (file.type.startsWith("image/")) {
         bodyType = "image";
         fileDataUrl = await readFileAsDataUrl(file);
-      } else if (file.type === "application/pdf") {
+      } else if (looksLikePdf) {
         bodyType = "pdf";
         fileDataUrl = await readFileAsDataUrl(file);
       } else {
