@@ -91,7 +91,7 @@ async function handleApi(req, res, url) {
   if (req.method === "POST" && url.pathname === "/api/admin/login") {
     const body = await readJson(req);
     const db = readDb();
-    if ((body.code || "").trim() !== db.settings.adminCode) {
+    if ((body.code || "").trim() !== getExpectedAdminCode(db)) {
       sendJson(res, 401, { error: "Invalid admin code" });
       return;
     }
@@ -315,6 +315,10 @@ function isValidToken(token) {
   if (!token) return false;
   const tokens = loadTokens();
   return Boolean(tokens[token]);
+}
+
+function getExpectedAdminCode(db) {
+  return String(process.env.ADMIN_CODE || db.settings.adminCode || seedDb.settings.adminCode).trim();
 }
 
 function getToken(req) {
