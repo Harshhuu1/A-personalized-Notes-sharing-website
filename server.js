@@ -214,11 +214,19 @@ async function handleApi(req, res, url) {
 
     const index = db.notes.findIndex((item) => item.id === note.id);
     if (index >= 0) {
-      db.notes[index] = { ...db.notes[index], ...note };
-    } else {
-      db.notes.unshift(note);
+      const existing = db.notes[index];
+      const merged = { ...existing, ...note };
+      if (!note.fileDataUrl) {
+        merged.bodyType = existing.bodyType;
+        merged.fileDataUrl = existing.fileDataUrl;
+        merged.fileName = existing.fileName;
+        merged.bodyText = note.bodyText || existing.bodyText;
     }
-    writeDb(db);
+      db.notes[index] = merged;
+}     else {
+        db.notes.unshift(note);
+}
+writeDb(db);
     sendJson(res, 200, { note });
     return;
   }

@@ -52,6 +52,7 @@ const adminEls = {
   noteSummaryInput: document.getElementById("noteSummaryInput"),
   noteBodyInput: document.getElementById("noteBodyInput"),
   noteFileInput: document.getElementById("noteFileInput"),
+  noteFileHint: document.getElementById("noteFileHint"),
   notesList: document.getElementById("notesList"),
   requestList: document.getElementById("requestList"),
   notesCount: document.getElementById("notesCount"),
@@ -646,8 +647,9 @@ async function saveNote(event) {
     });
 
     adminEls.noteForm.reset();
-    adminEls.noteIdInput.value = "";
-    await loadAdminBootstrap();
+adminEls.noteIdInput.value = "";
+if (adminEls.noteFileHint) adminEls.noteFileHint.textContent = "";
+await loadAdminBootstrap();
   } catch (error) {
     alert(error.message || "Could not save note");
   }
@@ -675,11 +677,17 @@ async function loadNoteIntoForm(id) {
   adminEls.notePriceInput.value = note.price || "";
   adminEls.noteSummaryInput.value = note.summary || "";
   adminEls.noteBodyInput.value = note.bodyText || "";
+if (adminEls.noteFileHint) {
+  adminEls.noteFileHint.textContent = note.fileDataUrl
+    ? `Currently attached: ${note.fileName || note.bodyType + " file"}. Leave the file field empty to keep it, or choose a new file to replace it.`
+    : "No file currently attached to this note.";
+}
 }
 
 function clearNoteForm() {
   adminEls.noteForm.reset();
   adminEls.noteIdInput.value = "";
+  if (adminEls.noteFileHint) adminEls.noteFileHint.textContent = "";
 }
 
 async function updateRequestStatus(id, status) {
