@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" data-page="user">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NoteVault - Buy Notes, View Online</title>
+    <meta
+      name="description"
+      content="Buy notes online, pay by QR, and open approved notes inside the website."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#home">
+        <span class="brand-mark">N</span>
+        <span class="brand-text">
+          <strong id="siteNameLabel">NoteVault</strong>
+          <small id="siteTaglineLabel">Sell notes securely</small>
+        </span>
+      </a>
+
+      <nav class="nav">
+        <a href="#home">Home</a>
+        <a href="#notes">Notes</a>
+        <a href="#payment">Payment</a>
+        <a href="#viewer">Viewer</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </header>
+
+    <main class="shell">
+      <section class="hero panel" id="home">
+        <div class="hero-copy">
+          <span class="eyebrow">Digital notes store</span>
+          <h1>Sell notes online, collect QR payments, and unlock approved access.</h1>
+          <p class="lede">
+            Customers can browse your note bundles, submit payment details, and open their approved
+            notes inside the site with an access code.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#notes">Browse Notes</a>
+            <a class="button secondary" href="#payment">Buy Notes</a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <strong>View-only</strong>
+              <span>No public download links</span>
+            </div>
+            <div>
+              <strong>QR payment</strong>
+              <span>Use your own QR image</span>
+            </div>
+            <div>
+              <strong>Access code</strong>
+              <span>Approve and unlock per buyer</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="card-header">
+            <span class="pill">Featured note</span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="preview-panel">
+            <div class="preview-row">
+              <span>Current note</span>
+              <strong id="featuredNoteTitle">Loading...</strong>
+            </div>
+            <div class="preview-row">
+              <span>Payment</span>
+              <strong id="upiText">UPI ID: loading...</strong>
+            </div>
+            <div class="preview-row">
+              <span>Access</span>
+              <strong>Admin approves requests</strong>
+            </div>
+            <div class="mini-grid">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <span class="eyebrow">Catalog</span>
+          <h2>Choose a note bundle</h2>
+        </div>
+        <p>All note data is managed from the dashboard. You can add, edit, or delete notes anytime.</p>
+      </section>
+
+      <section class="catalog" id="notes"></section>
+
+      <section class="panel split">
+        <div>
+          <span class="eyebrow">Payment</span>
+          <h2>Send payment request</h2>
+          <p>
+            Buyers pay using your QR, then submit the transaction details here. After approval, they
+            receive an access code for the specific note they purchased.
+          </p>
+          <ul class="feature-list">
+            <li>Connected to the hosted website</li>
+            <li>Access is granted only after admin approval</li>
+            <li>Approved notes open inside the browser</li>
+          </ul>
+          <a class="button primary" href="#payment">Open Payment Form</a>
+        </div>
+        <div class="qr-card">
+          <div class="qr-frame">
+            <img id="qrPreview" src="assets/qr-placeholder.svg" alt="Payment QR" />
+          </div>
+          <div class="qr-meta">
+            <strong>Payment QR</strong>
+            <span id="upiLabel">UPI ID: yourname@upi</span>
+            <span>Replace this from the admin dashboard.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel viewer-wrap" id="viewer">
+        <div class="section-head compact">
+          <div>
+            <span class="eyebrow">Viewer</span>
+            <h2>Open approved access</h2>
+          </div>
+          <p>Enter the access code you received after approval to view the note inside the site.</p>
+        </div>
+        <div class="viewer-toolbar">
+          <div class="viewer-code">
+            <label for="accessCodeInput">Access code</label>
+            <input id="accessCodeInput" type="text" placeholder="Enter access code" />
+          </div>
+          <div class="viewer-actions">
+            <button class="button secondary" id="openAccessBtn" type="button">Open access</button>
+            <button class="button ghost" id="saveAccessBtn" type="button">Save code</button>
+          </div>
+        </div>
+        <div class="viewer" id="noteViewer">
+          <div class="viewer-empty">
+            <h3>Enter your access code</h3>
+            <p>Once approved, your note will open here without a download button.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel split" id="payment">
+        <div>
+          <span class="eyebrow">Buyer form</span>
+          <h2>Submit payment details</h2>
+          <form id="paymentForm" class="stack-form">
+            <label>
+              Note bundle
+              <select id="paymentNote"></select>
+            </label>
+            <label>
+              Your name
+              <input id="buyerName" type="text" placeholder="Enter your name" required />
+            </label>
+            <label>
+              Transaction ID
+              <input id="txnId" type="text" placeholder="UPI transaction ID" required />
+            </label>
+            <label>
+              WhatsApp or email
+              <input id="buyerContact" type="text" placeholder="So you can be notified" required />
+            </label>
+            <button class="button primary" type="submit">Send request</button>
+          </form>
+          <p class="helper-text" id="paymentResult"></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
