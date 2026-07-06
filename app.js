@@ -6,6 +6,7 @@ const state = {
   requests: [],
   adminToken: sessionStorage.getItem("notenvault-admin-token") || "",
   selectedNoteId: "",
+  publicRefreshHandle: null,
 };
 
 const userEls = {
@@ -63,11 +64,24 @@ const adminEls = {
 init();
 
 async function init() {
-  await loadBootstrap();
+  try {
+    await loadBootstrap();
+  } catch (error) {
+    console.error("Bootstrap failed", error);
+    state.settings = {
+      siteName: "NoteVault",
+      tagline: "Sell notes securely",
+      upiId: "yourname@upi",
+      qrDataUrl: "assets/qr-placeholder.svg",
+      accessPin: "VIEW2026",
+    };
+    state.notes = [];
+  }
 
   if (page === "user") {
     renderUser();
     bindUserEvents();
+    startPublicRefresh();
   } else {
     bindAdminEvents();
     renderAdminLocked();
@@ -89,15 +103,48 @@ async function loadBootstrap() {
   state.selectedNoteId = state.notes[0]?.id || "";
 }
 
-function renderUser() {
-  if (!state.settings) return;
+function startPublicRefresh() {
+  refreshPublicData();
+  if (state.publicRefreshHandle) {
+    clearInterval(state.publicRefreshHandle);
+  }
 
-  setText(userEls.siteNameLabel, state.settings.siteName || "NoteVault");
-  setText(userEls.siteTaglineLabel, state.settings.tagline || "Sell notes securely");
-  setText(userEls.upiText, `UPI ID: ${state.settings.upiId || "yourname@upi"}`);
-  setText(userEls.upiLabel, `UPI ID: ${state.settings.upiId || "yourname@upi"}`);
+  state.publicRefreshHandle = setInterval(() => {
+    if (!document.hidden) {
+      refreshPublicData();
+    }
+  }, 30000);
+
+  window.addEventListener("focus", refreshPublicData);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      refreshPublicData();
+    }
+  });
+}
+
+async function refreshPublicData() {
+  const selectedNoteId = userEls.paymentSelect?.value || "";
+  try {
+    await loadBootstrap();
+    renderUserLabels();
+    if (selectedNoteId && userEls.paymentSelect) {
+      userEls.paymentSelect.value = selectedNoteId;
+    }
+  } catch (error) {
+    console.warn("Failed to refresh public data", error);
+  }
+}
+
+function renderUser() {
+  const settings = state.settings || {};
+
+  setText(userEls.siteNameLabel, settings.siteName || "NoteVault");
+  setText(userEls.siteTaglineLabel, settings.tagline || "Sell notes securely");
+  setText(userEls.upiText, `UPI ID: ${settings.upiId || "yourname@upi"}`);
+  setText(userEls.upiLabel, `UPI ID: ${settings.upiId || "yourname@upi"}`);
   if (userEls.qrPreview) {
-    userEls.qrPreview.src = state.settings.qrDataUrl || "assets/qr-placeholder.svg";
+    userEls.qrPreview.src = settings.qrDataUrl || "assets/qr-placeholder.svg";
   }
   if (userEls.featuredNoteTitle) {
     userEls.featuredNoteTitle.textContent = state.notes[0]?.title || "No notes yet";
@@ -110,6 +157,17 @@ function renderUser() {
   }
 
   if (userEls.catalog) {
+    if (!state.notes.length) {
+      userEls.catalog.innerHTML = `
+        <div class="panel note-card">
+          <span class="eyebrow">Catalog</span>
+          <h3>No notes yet</h3>
+          <p>Use the admin dashboard to add your first note bundle.</p>
+        </div>
+      `;
+      return;
+    }
+
     userEls.catalog.innerHTML = state.notes
       .map((note) => {
         const previewLabel = note.bodyType === "text" ? "Text note" : note.bodyType.toUpperCase();
@@ -632,13 +690,13 @@ async function updateRequestStatus(id, status) {
 }
 
 function renderUserLabels() {
-  if (!state.settings) return;
-  setText(userEls.siteNameLabel, state.settings.siteName || "NoteVault");
-  setText(userEls.siteTaglineLabel, state.settings.tagline || "Sell notes securely");
-  setText(userEls.upiText, `UPI ID: ${state.settings.upiId || "yourname@upi"}`);
-  setText(userEls.upiLabel, `UPI ID: ${state.settings.upiId || "yourname@upi"}`);
+  const settings = state.settings || {};
+  setText(userEls.siteNameLabel, settings.siteName || "NoteVault");
+  setText(userEls.siteTaglineLabel, settings.tagline || "Sell notes securely");
+  setText(userEls.upiText, `UPI ID: ${settings.upiId || "yourname@upi"}`);
+  setText(userEls.upiLabel, `UPI ID: ${settings.upiId || "yourname@upi"}`);
   if (userEls.qrPreview) {
-    userEls.qrPreview.src = state.settings.qrDataUrl || "assets/qr-placeholder.svg";
+    userEls.qrPreview.src = settings.qrDataUrl || "assets/qr-placeholder.svg";
   }
   if (userEls.featuredNoteTitle) {
     userEls.featuredNoteTitle.textContent = state.notes[0]?.title || "No notes yet";
@@ -649,6 +707,17 @@ function renderUserLabels() {
       .join("");
   }
   if (userEls.catalog) {
+    if (!state.notes.length) {
+      userEls.catalog.innerHTML = `
+        <div class="panel note-card">
+          <span class="eyebrow">Catalog</span>
+          <h3>No notes yet</h3>
+          <p>Use the admin dashboard to add your first note bundle.</p>
+        </div>
+      `;
+      return;
+    }
+
     userEls.catalog.innerHTML = state.notes
       .map((note) => {
         const previewLabel = note.bodyType === "text" ? "Text note" : note.bodyType.toUpperCase();
