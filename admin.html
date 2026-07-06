@@ -83,6 +83,9 @@
           <p class="helper-text">
             Change the admin password from the settings panel after logging in.
           </p>
+          <p class="helper-text" id="adminLockNotice">
+            The dashboard stays locked until the correct admin code is verified.
+          </p>
         </div>
 
         <div class="admin-card">
@@ -102,7 +105,7 @@
         </div>
       </section>
 
-      <section class="panel admin-grid" id="settings" data-admin-gated>
+      <section class="panel admin-grid hidden" id="settings" data-admin-gated>
         <div class="admin-card">
           <span class="eyebrow">Site settings</span>
           <h2>Update store details</h2>
@@ -147,7 +150,7 @@
         </div>
       </section>
 
-      <section class="panel admin-grid" id="notes" data-admin-gated>
+      <section class="panel admin-grid hidden" id="notes" data-admin-gated>
         <div class="admin-card">
           <span class="eyebrow">Notes</span>
           <h2>Add or edit note</h2>
@@ -192,7 +195,7 @@
         </div>
       </section>
 
-      <section class="panel admin-grid" id="requests" data-admin-gated>
+      <section class="panel admin-grid hidden" id="requests" data-admin-gated>
         <div class="admin-card">
           <span class="eyebrow">Requests</span>
           <h2>Buyer queue</h2>

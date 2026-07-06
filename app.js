@@ -31,6 +31,7 @@ const adminEls = {
   adminCodeInput: document.getElementById("adminCode"),
   adminStatusText: document.getElementById("adminStatusText"),
   loginTokenText: document.getElementById("loginTokenText"),
+  adminLockNotice: document.getElementById("adminLockNotice"),
   logoutBtn: document.getElementById("logoutBtn"),
   settingsForm: document.getElementById("settingsForm"),
   siteNameInput: document.getElementById("siteNameInput"),
@@ -69,15 +70,14 @@ async function init() {
     bindUserEvents();
   } else {
     bindAdminEvents();
+    renderAdminLocked();
     if (state.adminToken) {
       try {
         await loadAdminBootstrap();
       } catch {
         clearAdminSession();
-        renderAdmin();
+        renderAdminLocked();
       }
-    } else {
-      renderAdmin();
     }
   }
 }
@@ -289,6 +289,18 @@ function renderAdmin() {
   setAdminUnlockedUI(Boolean(state.adminToken));
 }
 
+function renderAdminLocked() {
+  fillAdminState();
+  if (adminEls.adminLockNotice) {
+    adminEls.adminLockNotice.textContent =
+      "The dashboard is locked. Enter the admin code to reveal settings, notes, and requests.";
+  }
+  setAdminUnlockedUI(false);
+  if (adminEls.adminQrPreview) {
+    adminEls.adminQrPreview.src = state.settings?.qrDataUrl || "assets/qr-placeholder.svg";
+  }
+}
+
 function fillAdminState() {
   setText(adminEls.adminStatusText, state.adminToken ? "Unlocked" : "Locked");
   setText(adminEls.loginTokenText, state.adminToken ? state.adminToken.slice(0, 8) : "No token");
@@ -310,6 +322,7 @@ function setAdminUnlockedUI(unlocked) {
   });
 
   document.querySelectorAll("[data-admin-gated]").forEach((section) => {
+    section.classList.toggle("hidden", !unlocked);
     section.classList.toggle("gated", !unlocked);
     section.querySelectorAll("input, textarea, select, button").forEach((field) => {
       field.disabled = !unlocked;
@@ -459,6 +472,8 @@ async function loginAdmin(event) {
     sessionStorage.setItem("notenvault-admin-token", response.token);
     await loadAdminBootstrap();
   } catch (error) {
+    clearAdminSession();
+    renderAdminLocked();
     alert(error.message || "Login failed");
   }
 }
@@ -475,7 +490,7 @@ async function loadAdminBootstrap() {
 
 async function logoutAdmin() {
   clearAdminSession();
-  renderAdmin();
+  renderAdminLocked();
 }
 
 function clearAdminSession() {
