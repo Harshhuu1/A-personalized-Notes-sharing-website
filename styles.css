@@ -603,6 +603,28 @@ textarea:focus {
   display: none;
 }
 
+.gated {
+  position: relative;
+  opacity: 0.45;
+  pointer-events: none;
+  filter: saturate(0.5);
+}
+
+.gated::after {
+  content: "Locked until admin login";
+  position: absolute;
+  inset: 18px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--text);
+  font-weight: 700;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: rgba(6, 10, 19, 0.55);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
 .admin-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

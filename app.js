@@ -4,7 +4,7 @@ const state = {
   settings: null,
   notes: [],
   requests: [],
-  adminToken: localStorage.getItem("notenvault-admin-token") || "",
+  adminToken: sessionStorage.getItem("notenvault-admin-token") || "",
   selectedNoteId: "",
 };
 
@@ -68,18 +68,17 @@ async function init() {
     renderUser();
     bindUserEvents();
   } else {
+    bindAdminEvents();
     if (state.adminToken) {
       try {
         await loadAdminBootstrap();
       } catch {
-        localStorage.removeItem("notenvault-admin-token");
-        state.adminToken = "";
+        clearAdminSession();
         renderAdmin();
       }
     } else {
       renderAdmin();
     }
-    bindAdminEvents();
   }
 }
 
@@ -286,11 +285,36 @@ function renderAdmin() {
   if (state.settings.qrDataUrl) {
     adminEls.adminQrPreview.src = state.settings.qrDataUrl;
   }
+
+  setAdminUnlockedUI(Boolean(state.adminToken));
 }
 
 function fillAdminState() {
   setText(adminEls.adminStatusText, state.adminToken ? "Unlocked" : "Locked");
   setText(adminEls.loginTokenText, state.adminToken ? state.adminToken.slice(0, 8) : "No token");
+}
+
+function setAdminUnlockedUI(unlocked) {
+  const controls = [
+    adminEls.logoutBtn,
+    adminEls.settingsForm,
+    adminEls.qrForm,
+    adminEls.noteForm,
+    adminEls.noteSelect,
+  ].filter(Boolean);
+
+  controls.forEach((control) => {
+    if ("disabled" in control) {
+      control.disabled = !unlocked;
+    }
+  });
+
+  document.querySelectorAll("[data-admin-gated]").forEach((section) => {
+    section.classList.toggle("gated", !unlocked);
+    section.querySelectorAll("input, textarea, select, button").forEach((field) => {
+      field.disabled = !unlocked;
+    });
+  });
 }
 
 function fillSettingsForm() {
@@ -432,7 +456,7 @@ async function loginAdmin(event) {
       body: JSON.stringify({ code }),
     });
     state.adminToken = response.token;
-    localStorage.setItem("notenvault-admin-token", response.token);
+    sessionStorage.setItem("notenvault-admin-token", response.token);
     await loadAdminBootstrap();
   } catch (error) {
     alert(error.message || "Login failed");
@@ -450,9 +474,13 @@ async function loadAdminBootstrap() {
 }
 
 async function logoutAdmin() {
-  state.adminToken = "";
-  localStorage.removeItem("notenvault-admin-token");
+  clearAdminSession();
   renderAdmin();
+}
+
+function clearAdminSession() {
+  state.adminToken = "";
+  sessionStorage.removeItem("notenvault-admin-token");
 }
 
 async function saveSettings(event) {

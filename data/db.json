@@ -32,18 +32,6 @@
       "fileName": "",
       "createdAt": "2026-07-06T00:00:00.000Z",
       "updatedAt": "2026-07-06T00:00:00.000Z"
-    },
-    {
-      "id": "chemistry-short-notes",
-      "title": "Chemistry Short Notes",
-      "category": "Board exam",
-      "price": "INR 59",
-      "summary": "Concise definitions, reactions, and memory-friendly chapter summaries for revision.",
-      "bodyType": "text",
-      "bodyText": "Atomic structure, periodicity, bonding, acids and bases, and quick reaction maps.\n\nUse this pack for one-day revision before exams.",
-      "fileName": "",
-      "createdAt": "2026-07-06T00:00:00.000Z",
-      "updatedAt": "2026-07-06T00:00:00.000Z"
     }
   ],
   "requests": [
