@@ -326,7 +326,15 @@ function renderNoteBody(note) {
   }
 
   if (note.bodyType === "pdf" && note.fileDataUrl) {
-    return `<iframe class="note-media note-pdf" src="${escapeAttr(note.fileDataUrl)}" title="${escapeAttr(note.title)}"></iframe>`;
+    const fileName = escapeAttr(note.fileName || `${note.title}.pdf`);
+    return `
+      <div class="pdf-fallback" style="margin-bottom:10px;">
+        <a class="button primary" href="${escapeAttr(note.fileDataUrl)}" download="${fileName}" target="_blank" rel="noopener">
+          Open / Download PDF
+        </a>
+      </div>
+      <iframe class="note-media note-pdf" src="${escapeAttr(note.fileDataUrl)}" title="${escapeAttr(note.title)}"></iframe>
+    `;
   }
 
   const body = note.bodyText || "";
