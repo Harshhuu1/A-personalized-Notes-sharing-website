@@ -64,9 +64,7 @@ const adminEls = {
 init();
 
 async function init() {
-  try {
-    await loadBootstrap();
-  } catch (error) {
+  const bootstrapPromise = loadBootstrap().catch((error) => {
     console.error("Bootstrap failed", error);
     state.settings = {
       siteName: "NoteVault",
@@ -76,17 +74,25 @@ async function init() {
       accessPin: "VIEW2026",
     };
     state.notes = [];
-  }
+  });
 
   if (page === "user") {
-    renderUser();
     bindUserEvents();
+    renderUser();
     startPublicRefresh();
+    await bootstrapPromise;
+    renderUser();
   } else {
     bindAdminEvents();
     renderAdminLocked();
+    void bootstrapPromise.then(() => {
+      if (!state.adminToken) {
+        renderAdminLocked();
+      }
+    });
     if (state.adminToken) {
       try {
+        await bootstrapPromise;
         await loadAdminBootstrap();
       } catch {
         clearAdminSession();
